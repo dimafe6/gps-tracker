@@ -1,7 +1,20 @@
-#define FAKE_GPS;
-#define NMEA "$GPRMC,192631,A,5025.072260,N,03026.522160,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192631,5025.072260,N,03026.522160,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.072260,N,03026.522160,E,192631,A,A*4F\r\n$GPZDA,192631,17,05,2018,,*4E\r\n$GPGSA,A,3,07,25,16,01,18,22,26,30,08,47,24,06,1.32,0.78,1.07*08\r\n$GPGSV,3,1,12,07,90,0,44,25,30,240,40,16,30,120,40,01,30,0,40*75\r\n$GPGSV,3,2,12,18,59,203,42,22,59,278,40,26,15,108,40,30,49,183,41*70\r\n$GPGSV,3,3,12,08,35,057,49,47,32,125,46,24,20,152,47,06,16,274,42*7A\r\n$GPRMC,192641,A,5025.085880,N,03026.531982,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192641,5025.085880,N,03026.531982,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.085880,N,03026.531982,E,192641,A,A*42\r\n$GPZDA,192641,17,05,2018,,*49\r\n$GPRMC,192651,A,5025.099499,N,03026.541803,E,5.4,24.7,170518,,,A*48\r\n$GPGGA,192651,5025.099499,N,03026.541803,E,1,12,0.78,3.0,M,0.0,M,,*4F\r\n$GPGLL,5025.099499,N,03026.541803,E,192651,A,A*45\r\n$GPZDA,192651,17,05,2018,,*48\r\n$GPRMC,192701,A,5025.113119,N,03026.551625,E,5.4,24.7,170518,,,A*49\r\n$GPGGA,192701,5025.113119,N,03026.551625,E,1,12,0.78,3.0,M,0.0,M,,*4E\r\n$GPGLL,5025.113119,N,03026.551625,E,192701,A,A*44\r\n$GPZDA,192701,17,05,2018,,*4C\r\n$GPGSA,A,3,07,25,16,01,18,22,26,30,08,47,24,06,1.32,0.78,1.07*08\r\n$GPGSV,3,1,12,07,90,0,44,25,30,240,40,16,30,120,40,01,30,0,40*75\r\n$GPGSV,3,2,12,18,59,203,42,22,59,278,40,26,15,108,40,30,49,183,41*70\r\n$GPGSV,3,3,12,08,35,057,49,47,32,125,46,24,20,152,47,06,16,274,42*7A\r\n$GPRMC,192711,A,5025.126739,N,03026.561447,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192711,5025.126739,N,03026.561447,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.126739,N,03026.561447,E,192711,A,A*42\r\n$GPZDA,192711,17,05,2018,,*4D\r\n$GPRMC,192721,A,5025.140358,N,03026.571269,E,5.4,24.7,170518,,,A*44\r\n$GPGGA,192721,5025.140358,N,03026.571269,E,1,12,0.78,3.0,M,0.0,M,,*43\r\n$GPGLL,5025.140358,N,03026.571269,E,192721,A,A*49\r\n$GPZDA,192721,17,05,2018,,*4E\r\n$GPRMC,192731,A,5025.153978,N,03026.581091,E,5.4,24.7,170518,,,A*45\r\n$GPGGA,192731,5025.153978,N,03026.581091,E,1,12,0.78,3.0,M,0.0,M,,*42\r\n$GPGLL,5025.153978,N,03026.581091,E,192731,A,A*48\r\n$GPZDA,192731,17,05,2018,,*4F\r\n$GPGSA,A,3,07,25,16,01,18,22,26,30,08,47,24,06,1.32,0.78,1.07*08\r\n$GPGSV,3,1,12,07,90,0,44,25,30,240,40,16,30,120,40,01,30,0,40*75\r\n$GPGSV,3,2,12,18,59,203,42,22,59,278,40,26,15,108,40,30,49,183,41*70\r\n$GPGSV,3,3,12,08,35,057,49,47,32,125,46,24,20,152,47,06,16,274,42*7A\r\n$GPRMC,192741,A,5025.167597,N,03026.590914,E,5.4,24.7,170518,,,A*4C\r\n$GPGGA,192741,5025.167597,N,03026.590914,E,1,12,0.78,3.0,M,0.0,M,,*4B\r\n$GPGLL,5025.167597,N,03026.590914,E,192741,A,A*41\r\n$GPZDA,192741,17,05,2018,,*48\r\n$GPRMC,192751,A,5025.181217,N,03026.600736,E,5.4,24.7,170518,,,A*4E\r\n$GPGGA,192751,5025.181217,N,03026.600736,E,1,12,0.78,3.0,M,0.0,M,,*49\r\n$GPGLL,5025.181217,N,03026.600736,E,192751,A,A*43\r\n$GPZDA,192751,17,05,2018,,*49\r\n$GPRMC,192801,A,5025.194836,N,03026.610558,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192801,5025.194836,N,03026.610558,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.194836,N,03026.610558,E,192801,A,A*4F\r\n$GPZDA,192801,17,05,2018,,*43\r\n$GPGSA,A,3,07,25,16,01,18,22,26,30,08,47,24,06,1.32,0.78,1.07*08\r\n$GPGSV,3,1,12,07,90,0,44,25,30,240,40,16,30,120,40,01,30,0,40*75\r\n$GPGSV,3,2,12,18,59,203,42,22,59,278,40,26,15,108,40,30,49,183,41*70\r\n$GPGSV,3,3,12,08,35,057,49,47,32,125,46,24,20,152,47,06,16,274,42*7A\r\n$GPRMC,192811,A,5025.208456,N,03026.620381,E,5.4,24.7,170518,,,A*4E\r\n$GPGGA,192811,5025.208456,N,03026.620381,E,1,12,0.78,3.0,M,0.0,M,,*49\r\n$GPGLL,5025.208456,N,03026.620381,E,192811,A,A*43\r\n$GPZDA,192811,17,05,2018,,*42\r\n$GPRMC,192821,A,5025.222075,N,03026.630203,E,5.4,24.7,170518,,,A*4A\r\n$GPGGA,192821,5025.222075,N,03026.630203,E,1,12,0.78,3.0,M,0.0,M,,*4D\r\n$GPGLL,5025.222075,N,03026.630203,E,192821,A,A*47\r\n$GPZDA,192821,17,05,2018,,*41\r\n$GPRMC,192831,A,5025.235695,N,03026.640026,E,5.4,24.7,170518,,,A*47\r\n$GPGGA,192831,5025.235695,N,03026.640026,E,1,12,0.78,3.0,M,0.0,M,,*40\r\n$GPGLL,5025.235695,N,03026.640026,E,192831,A,A*4A\r\n$GPZDA,192831,17,05,2018,,*40\r\n$GPGSA,A,3,07,25,16,01,18,22,26,30,08,47,24,06,1.32,0.78,1.07*08\r\n$GPGSV,3,1,12,07,90,0,44,25,30,240,40,16,30,120,40,01,30,0,40*75\r\n$GPGSV,3,2,12,18,59,203,42,22,59,278,40,26,15,108,40,30,49,183,41*70\r\n$GPGSV,3,3,12,08,35,057,49,47,32,125,46,24,20,152,47,06,16,274,42*7A\r\n$GPRMC,192841,A,5025.249314,N,03026.649849,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192841,5025.249314,N,03026.649849,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.249314,N,03026.649849,E,192841,A,A*42\r\n$GPZDA,192841,17,05,2018,,*47\r\n$GPRMC,192851,A,5025.262934,N,03026.659672,E,5.4,24.7,170518,,,A*48\r\n$GPGGA,192851,5025.262934,N,03026.659672,E,1,12,0.78,3.0,M,0.0,M,,*4F\r\n$GPGLL,5025.262934,N,03026.659672,E,192851,A,A*45\r\n$GPZDA,192851,17,05,2018,,*46\r\n$GPRMC,192901,A,5025.276553,N,03026.669495,E,5.4,24.7,170518,,,A*4C\r\n$GPGGA,192901,5025.276553,N,03026.669495,E,1,12,0.78,3.0,M,0.0,M,,*4B\r\n$GPGLL,5025.276553,N,03026.669495,E,192901,A,A*41\r\n$GPZDA,192901,17,05,2018,,*42\r\n$GPGSA,A,3,07,25,16,01,18,22,26,30,08,47,24,06,1.32,0.78,1.07*08\r\n$GPGSV,3,1,12,07,90,0,44,25,30,240,40,16,30,120,40,01,30,0,40*75\r\n$GPGSV,3,2,12,18,59,203,42,22,59,278,40,26,15,108,40,30,49,183,41*70\r\n$GPGSV,3,3,12,08,35,057,49,47,32,125,46,24,20,152,47,06,16,274,42*7A\r\n$GPRMC,192911,A,5025.290173,N,03026.679318,E,5.4,24.7,170518,,,A*40\r\n$GPGGA,192911,5025.290173,N,03026.679318,E,1,12,0.78,3.0,M,0.0,M,,*47\r\n$GPGLL,5025.290173,N,03026.679318,E,192911,A,A*4D\r\n$GPZDA,192911,17,05,2018,,*43\r\n"
-#define BLYNK_PRINT Serial
+//#define FAKE_GPS;
+#ifdef FAKE_GPS;
+String NMEA[10] {
+  "$GPRMC,192631,A,5025.072260,N,03026.522160,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192631,5025.072260,N,03026.522160,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.072260,N,03026.522160,E,192631,A,A*4F\r\n$GPZDA,192631,17,05,2018,,*4E\r\n",
+  "$GPRMC,192641,A,5025.085880,N,03026.531982,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192641,5025.085880,N,03026.531982,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.085880,N,03026.531982,E,192641,A,A*42\r\n$GPZDA,192641,17,05,2018,,*49\r\n",
+  "$GPRMC,192651,A,5025.099499,N,03026.541803,E,5.4,24.7,170518,,,A*48\r\n$GPGGA,192651,5025.099499,N,03026.541803,E,1,12,0.78,3.0,M,0.0,M,,*4F\r\n$GPGLL,5025.099499,N,03026.541803,E,192651,A,A*45\r\n$GPZDA,192651,17,05,2018,,*48\r\n",
+  "$GPRMC,192701,A,5025.113119,N,03026.551625,E,5.4,24.7,170518,,,A*49\r\n$GPGGA,192701,5025.113119,N,03026.551625,E,1,12,0.78,3.0,M,0.0,M,,*4E\r\n$GPGLL,5025.113119,N,03026.551625,E,192701,A,A*44\r\n$GPZDA,192701,17,05,2018,,*4C\r\n",
+  "$GPRMC,192711,A,5025.126739,N,03026.561447,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192711,5025.126739,N,03026.561447,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.126739,N,03026.561447,E,192711,A,A*42\r\n$GPZDA,192711,17,05,2018,,*4D\r\n",
+  "$GPRMC,192721,A,5025.140358,N,03026.571269,E,5.4,24.7,170518,,,A*44\r\n$GPGGA,192721,5025.140358,N,03026.571269,E,1,12,0.78,3.0,M,0.0,M,,*43\r\n$GPGLL,5025.140358,N,03026.571269,E,192721,A,A*49\r\n$GPZDA,192721,17,05,2018,,*4E\r\n",
+  "$GPRMC,192731,A,5025.153978,N,03026.581091,E,5.4,24.7,170518,,,A*45\r\n$GPGGA,192731,5025.153978,N,03026.581091,E,1,12,0.78,3.0,M,0.0,M,,*42\r\n$GPGLL,5025.153978,N,03026.581091,E,192731,A,A*48\r\n$GPZDA,192731,17,05,2018,,*4F\r\n",
+  "$GPRMC,192741,A,5025.167597,N,03026.590914,E,5.4,24.7,170518,,,A*4C\r\n$GPGGA,192741,5025.167597,N,03026.590914,E,1,12,0.78,3.0,M,0.0,M,,*4B\r\n$GPGLL,5025.167597,N,03026.590914,E,192741,A,A*41\r\n$GPZDA,192741,17,05,2018,,*48\r\n",
+  "$GPRMC,192751,A,5025.181217,N,03026.600736,E,5.4,24.7,170518,,,A*4E\r\n$GPGGA,192751,5025.181217,N,03026.600736,E,1,12,0.78,3.0,M,0.0,M,,*49\r\n$GPGLL,5025.181217,N,03026.600736,E,192751,A,A*43\r\n$GPZDA,192751,17,05,2018,,*49\r\n",
+  "$GPRMC,192801,A,5025.194836,N,03026.610558,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192801,5025.194836,N,03026.610558,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.194836,N,03026.610558,E,192801,A,A*4F\r\n$GPZDA,192801,17,05,2018,,*43\r\n"
+};
+#endif
 
+#define BLYNK_PRINT Serial
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -17,11 +30,6 @@ extern "C" {
 	#include "user_interface.h"
 }
 
-#ifdef FAKE_GPS
-String nmeaBuff = NMEA;
-int nmeaIndex = 0;
-#endif
-
 static const int RXPin = D1, TXPin = SW_SERIAL_UNUSED_PIN;
 static const uint32_t GPSBaud = 9600;
 const int chipSelect = D2;
@@ -29,10 +37,10 @@ const int powerSwitchPin = 10;
 
 char auth[] = "a1436b98817c426ea91740829e164a3f";
 //char ssid[] = "VirtualRouter.codeplex.com";
-//char ssid[] = "Zenfone4";
-//char pass[] = "12345678";
-char ssid[] = "dimaPC";
-char pass[] = "I0U5cRX3";
+char ssid[] = "Zenfone4";
+char pass[] = "12345678";
+//char ssid[] = "dimaPC";
+//char pass[] = "I0U5cRX3";
 
 unsigned long startGPSFindTime = millis();
 int WiFiConnectionTimer;
@@ -41,6 +49,9 @@ int gpsTimer;
 unsigned int wifiConnectionRetries;
 unsigned int blynkConnectionRetries;
 String newTrackName = "";
+String waypointName = "";
+String waypointDesc = "";
+bool createNewWaypoint = false;
 
 SimpleTimer timer;
 WidgetMap myMap(V0);
@@ -62,6 +73,7 @@ struct Config {
   unsigned int frequencyWaypoints = 100;
   String sleepType = "MANUAL";
   unsigned int lastMapPointIndex = 1;
+  bool gpsFixNotify = false;
 };
 
 const char *configFilename = "CONFIG.TXT";
@@ -183,7 +195,7 @@ void onBlynkConnected() {
 
   Serial.println("Blynk server connected");
   
-    runGPSTimer();
+  runGPSTimer();
 }
 
 void onWiFiConnectionTimeout() {
@@ -209,6 +221,7 @@ void loadConfiguration(JsonObject &root, Config &config) {
   String sleepType = root["sleepType"].as<String>();
   config.sleepType = sleepType == "" ? config.sleepType : sleepType;
   config.lastMapPointIndex = root["lastMapPointIndex"] | config.lastMapPointIndex;
+  config.gpsFixNotify = root["gpsFixNotify"] == 1 ? true : false;
 
   root.printTo(Serial);
 }
@@ -266,6 +279,7 @@ void saveConfiguration(const char *filename, const Config &config) {
     root["frequencyWaypoints"] = config.frequencyWaypoints;
     root["sleepType"] = config.sleepType;
     root["lastMapPointIndex"] = config.lastMapPointIndex;
+    root["gpsFixNotify"] = config.gpsFixNotify ? 1 : 0;
 
     if (root.printTo(file) == 0) {
       Serial.println(F("Failed to write to file"));
@@ -319,26 +333,20 @@ void processGPSData() {
   #ifdef FAKE_GPS
   	int i = 0;
 
-  	if(nmeaIndex+2 >= nmeaBuff.length()) {
-  		nmeaIndex = 0;
-  	}
-
-    if(nmeaIndex < 0) {
-      nmeaIndex = 0;
+    int index = config.lastMapPointIndex;
+    if(index >= 10) {
+      config.lastMapPointIndex = 0;
+      index = 0;
     }
-   
-		for(i = nmeaIndex; i < nmeaBuff.length(); i++) {
+
+    String nmeaBuff = NMEA[index];
+		for(i = 0; i < nmeaBuff.length() - 1; i++) {
 			character = nmeaBuff[i];
-	    content.concat(character);
-	    if (gps.encode(character)) {
-        if(gps.location.lat() == config.prevLatitude && gps.location.lng() == config.prevLongitude) {
-          continue;
-        }
-        
-	    	nmeaIndex = i;
+	    if (gps.encode(character)) {       
 	      displayInfo();
 	    }
 	  }
+    config.lastMapPointIndex++;
   #else
 	  while (ss.available() && currentSearchTime <= config.gpsSearchTime && config.trackPaused == false) {
 	    character = ss.read();
@@ -375,16 +383,14 @@ void displayInfo() {
       Serial.println(alt, 2);
       Serial.print("SATS: ");
       Serial.println(sats, 1);
-    
-      char date[32];
-      sprintf(date, "%02d-%02d-%02d %02d:%02d:%02d ", gps.date.month(), gps.date.day(), gps.date.year(),  gps.time.hour(),  gps.time.minute(),  gps.time.second());
-
-      myMap.location(config.lastMapPointIndex++, latitude, longitude, date);
-
-      config.prevLatitude = latitude;
-      config.prevLongitude = longitude;
 
       writeToSD();
+
+      if(config.gpsFixNotify) {
+        Serial.println("GPS fix found");
+        Blynk.notify("GPS fix found");
+      }
+
       sleep();
     }
   }
@@ -428,13 +434,22 @@ bool checkTraveledDistance() {
 }
 
 void writeToSD() {
-	char sz[32];
-	sprintf(sz, "%02d-%02d-%02d %02d:%02d:%02d ", gps.date.month(), gps.date.day(), gps.date.year(),  gps.time.hour(),  gps.time.minute(),  gps.time.second());
+	char date[32];
+	sprintf(date, "%02d-%02d-%02d %02d:%02d:%02d ", gps.date.month(), gps.date.day(), gps.date.year(),  gps.time.hour(),  gps.time.minute(),  gps.time.second());
 	File dataFile = SD.open(getTrackFileName(), FILE_WRITE);
+
+  config.prevLatitude = gps.location.lat();
+  config.prevLongitude = gps.location.lng();
 
 	Serial.println();
 
-	dataFile.print("T");dataFile.print(",");
+  if(createNewWaypoint) {
+    dataFile.print("W");
+  } else {
+    dataFile.print("T");
+  }
+
+  dataFile.print(",");
 	dataFile.print((!gps.satellites.isValid()) ? 0 : gps.satellites.value()); dataFile.print(",");
 	dataFile.print(!gps.hdop.isValid() ? 0 : gps.hdop.value()); dataFile.print(",");
 	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lat(), 6); dataFile.print(",");
@@ -444,19 +459,34 @@ void writeToSD() {
 	if (!gps.date.isValid() && !gps.time.isValid()) {
 	  dataFile.print("0");
 	} else {
-	  dataFile.print(sz);
+	  dataFile.print(date);
 	}
 	dataFile.print(",");
 
 	dataFile.print(!gps.altitude.isValid() ? 0 : gps.altitude.meters()); dataFile.print(",");
 	dataFile.print(!gps.course.isValid() ? 0 : gps.course.deg()); dataFile.print(",");
-	dataFile.print(!gps.speed.kmph() ? 0 : gps.speed.kmph(), 2);
-	dataFile.print(","); //name
-	dataFile.print(","); //desc
+	dataFile.print(!gps.speed.kmph() ? 0 : gps.speed.kmph(), 2);dataFile.print(",");
+	
+  if(createNewWaypoint) {
+    myMap.location(config.lastMapPointIndex++, config.prevLatitude, config.prevLongitude, waypointName);
+
+    dataFile.print(waypointName);dataFile.print(",");
+    dataFile.print(waypointDesc);
+
+    createNewWaypoint = false;
+    Blynk.virtualWrite(V15,  0);
+    Blynk.notify("Added waypoint " + waypointName);
+    waypointName = "";
+    waypointDesc = "";
+  } else {
+    myMap.location(config.lastMapPointIndex++, config.prevLatitude, config.prevLongitude, date);
+  }
 
 	dataFile.println();
 	dataFile.flush();
 	dataFile.close();
+
+  Serial.println("Location saved to SD.");
 }
 
 BLYNK_CONNECTED() {
@@ -521,6 +551,7 @@ BLYNK_WRITE(V10){
 
 BLYNK_WRITE(V11){
   if(param.asInt() == 1) {
+    config.lastMapPointIndex = 0;
     myMap.clear();
     Blynk.virtualWrite(V11, 0);
   }
@@ -553,4 +584,25 @@ BLYNK_WRITE(V12){
 
 BLYNK_WRITE(V13){
   newTrackName = param.asString();  
+}
+
+BLYNK_WRITE(V14){
+  waypointName = param.asString();  
+}
+
+BLYNK_WRITE(V15){
+  if(param.asInt() == 1 && waypointName != "") {
+    createNewWaypoint = true;
+  } else {
+    createNewWaypoint = false;
+  }
+}
+
+BLYNK_WRITE(V16){
+  waypointDesc = param.asString();  
+}
+
+BLYNK_WRITE(V17){
+  bool newState = param.asInt() == 1;
+  config.gpsFixNotify = newState;
 }
