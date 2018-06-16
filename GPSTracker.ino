@@ -306,7 +306,11 @@ void runGPSTimer() {
 void sleep() {
   saveConfiguration(configFilename, config);
 
-	if(config.sleepTime > 0) {
+  if(config.sleepType == "NO_SLEEP") {
+    return;
+  }
+
+	if(config.sleepTime > 0 && config.sleepType == "MANUAL") {
 		Serial.println("");
 		Serial.println("Sleeping...");
 
@@ -536,6 +540,9 @@ BLYNK_WRITE(V10){
       break;
     case 2:
       config.sleepType = "MANUAL";
+      break;
+    case 3:
+      config.sleepType = "NO_SLEEP";
       break;
     default:
       config.sleepType = "MANUAL";
