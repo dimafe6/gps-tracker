@@ -1,4 +1,4 @@
-//#define FAKE_GPS;
+#define FAKE_GPS;
 #ifdef FAKE_GPS;
 String NMEA[10] {
   "$GPRMC,192631,A,5025.072260,N,03026.522160,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192631,5025.072260,N,03026.522160,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.072260,N,03026.522160,E,192631,A,A*4F\r\n$GPZDA,192631,17,05,2018,,*4E\r\n",
@@ -22,9 +22,8 @@ String NMEA[10] {
 #include <ESP8266WiFi.h>
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
-#include <SPI.h>
-#include <SD.h>
 #include <ArduinoJson.h>
+#include "FS.h"
 
 extern "C" {
 	#include "user_interface.h"
@@ -32,15 +31,14 @@ extern "C" {
 
 static const int RXPin = D1, TXPin = SW_SERIAL_UNUSED_PIN;
 static const uint32_t GPSBaud = 9600;
-const int chipSelect = D2;
 const int powerSwitchPin = 10;
 
 char auth[] = "a1436b98817c426ea91740829e164a3f";
 //char ssid[] = "VirtualRouter.codeplex.com";
-char ssid[] = "Zenfone4";
-char pass[] = "12345678";
-//char ssid[] = "dimaPC";
-//char pass[] = "I0U5cRX3";
+//char ssid[] = "Zenfone4";
+//char pass[] = "12345678";
+char ssid[] = "dimaPC";
+char pass[] = "I0U5cRX3";
 
 unsigned long startGPSFindTime = millis();
 int WiFiConnectionTimer;
@@ -76,7 +74,7 @@ struct Config {
   bool gpsFixNotify = false;
 };
 
-const char *configFilename = "CONFIG.TXT";
+const char *configFilename = "/CONFIG.TXT";
 Config config;
 
 void setup() {
@@ -91,7 +89,7 @@ void setup() {
   ss.begin(GPSBaud);
   ss.enableIntTx(false);
 
-  initSDCard();
+  initSPIFFS();
   
   initWiFi();
 
@@ -103,25 +101,25 @@ void loop() {
   timer.run();
 }
 
-void initSDCard() {
+void initSPIFFS() {
   Serial.println("");
-  Serial.print("Initializing SD card...");
+  Serial.print("Initializing SPIFFS...");
 
-  if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
+  if (!SPIFFS.begin()) {
+    Serial.println("SPIFFS initialization failed");
     sleep();
   }
 
-  Serial.println("card initialized.");
+  Serial.println("SPIFFS initialized.");
 
   // Load last saved configuration
-  loadConfiguration(configFilename, config);  
+  loadConfiguration(configFilename, config);
 
-  if (!SD.exists(getTrackFileName()))
+  if (!SPIFFS.exists(getTrackFileName()))
   {
-  	Serial.println("Creating new track file " + getTrackFileName());
-    File dataFile = SD.open(getTrackFileName(), FILE_WRITE);
-    dataFile.println(F("type, satellites, hdop, latitude, longitude, age, date, alt, course, speed, name, desc"));
+  	Serial.println("Creating new track file " + getTrackName());
+    File dataFile = SPIFFS.open(getTrackFileName(), "w+");
+    dataFile.println(F("type, latitude, longitude, date, alt, speed, name, desc"));
     dataFile.close();
   }
 }
@@ -227,9 +225,9 @@ void loadConfiguration(JsonObject &root, Config &config) {
 }
 
 void loadConfiguration(const char *filename, Config &config) {
-  Serial.println("Loading configuration from SD...");
+  Serial.println("Loading configuration from SPIFFS...");
 
-  File file = SD.open(filename);
+  File file = SPIFFS.open(filename, "r");
 
   // Allocate the memory pool on the stack.
   // Don't forget to change the capacity to match your JSON document.
@@ -250,50 +248,46 @@ void loadConfiguration(const char *filename, Config &config) {
 // Saves the configuration to a file
 void saveConfiguration(const char *filename, const Config &config) {
   Serial.println("");
-  Serial.println("Saving configuration...");
-  Serial.print("Removing configuration file ");Serial.print(filename);Serial.print(" ...");
-  
-  if(SD.remove(filename)) {
-    Serial.println("OK");
+  Serial.println("Saving configuration...");  
 
-    File file = SD.open(filename, FILE_WRITE);
-    if (!file) {
-      Serial.println(F("Failed to create file"));
-      return;
-    }
-
-    StaticJsonBuffer<1024> jsonBuffer;
-
-    JsonObject &root = jsonBuffer.createObject();
-
-    root["prevLatitude"] = config.prevLatitude;
-    root["prevLongitude"] = config.prevLongitude;
-    root["gpsSearchTime"] = config.gpsSearchTime;
-    root["sleepTime"] = config.sleepTime;
-    root["wifiConnectionTimeout"] = config.wifiConnectionTimeout;
-    root["wifiConnectionRetries"] = config.wifiConnectionRetries;
-    root["blynkConnectionTimeout"] = config.blynkConnectionTimeout;
-    root["blynkConnectionRetries"] = config.blynkConnectionRetries;
-    root["currentTrackName"] = config.currentTrackName;
-    root["trackPaused"] = config.trackPaused ? 1 : 0;
-    root["frequencyWaypoints"] = config.frequencyWaypoints;
-    root["sleepType"] = config.sleepType;
-    root["lastMapPointIndex"] = config.lastMapPointIndex;
-    root["gpsFixNotify"] = config.gpsFixNotify ? 1 : 0;
-
-    if (root.printTo(file) == 0) {
-      Serial.println(F("Failed to write to file"));
-    } else {
-      String settings;
-      root.printTo(settings);
-    }
-
-    root.printTo(Serial);
-
-    file.close();
-  } else {
-    Serial.println(F("Failed to remove file"));
+  File file = SPIFFS.open(filename, "w+");
+  if (!file) {
+    Serial.println(F("Failed to create file"));
+    return;
   }
+
+  StaticJsonBuffer<1024> jsonBuffer;
+
+  JsonObject &root = jsonBuffer.createObject();
+
+  root["prevLatitude"] = config.prevLatitude;
+  root["prevLongitude"] = config.prevLongitude;
+  root["gpsSearchTime"] = config.gpsSearchTime;
+  root["sleepTime"] = config.sleepTime;
+  root["wifiConnectionTimeout"] = config.wifiConnectionTimeout;
+  root["wifiConnectionRetries"] = config.wifiConnectionRetries;
+  root["blynkConnectionTimeout"] = config.blynkConnectionTimeout;
+  root["blynkConnectionRetries"] = config.blynkConnectionRetries;
+  root["currentTrackName"] = config.currentTrackName;
+  root["trackPaused"] = config.trackPaused ? 1 : 0;
+  root["frequencyWaypoints"] = config.frequencyWaypoints;
+  root["sleepType"] = config.sleepType;
+  root["lastMapPointIndex"] = config.lastMapPointIndex;
+  root["gpsFixNotify"] = config.gpsFixNotify ? 1 : 0;
+
+  if (root.printTo(file) == 0) {
+    Serial.println(F("Failed to write to file"));
+  } else {
+    String settings;
+    root.printTo(settings);
+  }
+
+  root.printTo(Serial);
+  
+  Serial.println("");
+  Serial.println("OK");
+  
+  file.close();
 }
 
 void offlineMode() {
@@ -384,7 +378,7 @@ void displayInfo() {
       Serial.print("SATS: ");
       Serial.println(sats, 1);
 
-      writeToSD();
+      writeToSPIFF();
 
       if(config.gpsFixNotify) {
         Serial.println("GPS fix found");
@@ -397,6 +391,10 @@ void displayInfo() {
 }
 
 String getTrackFileName() {
+	return "/" + config.currentTrackName;
+}
+
+String getTrackName() {
 	return config.currentTrackName;
 }
 
@@ -433,10 +431,10 @@ bool checkTraveledDistance() {
   return (distance >= config.frequencyWaypoints)  && (distance <= 3000);
 }
 
-void writeToSD() {
+void writeToSPIFF() {
 	char date[32];
 	sprintf(date, "%02d-%02d-%02d %02d:%02d:%02d ", gps.date.month(), gps.date.day(), gps.date.year(),  gps.time.hour(),  gps.time.minute(),  gps.time.second());
-	File dataFile = SD.open(getTrackFileName(), FILE_WRITE);
+	File dataFile = SPIFFS.open(getTrackFileName(), "a+");
 
   config.prevLatitude = gps.location.lat();
   config.prevLongitude = gps.location.lng();
@@ -450,11 +448,8 @@ void writeToSD() {
   }
 
   dataFile.print(",");
-	dataFile.print((!gps.satellites.isValid()) ? 0 : gps.satellites.value()); dataFile.print(",");
-	dataFile.print(!gps.hdop.isValid() ? 0 : gps.hdop.value()); dataFile.print(",");
 	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lat(), 6); dataFile.print(",");
 	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lng(), 6); dataFile.print(",");
-	dataFile.print(!gps.location.isValid() ? 0 : gps.location.age()); dataFile.print(",");
 
 	if (!gps.date.isValid() && !gps.time.isValid()) {
 	  dataFile.print("0");
@@ -464,7 +459,6 @@ void writeToSD() {
 	dataFile.print(",");
 
 	dataFile.print(!gps.altitude.isValid() ? 0 : gps.altitude.meters()); dataFile.print(",");
-	dataFile.print(!gps.course.isValid() ? 0 : gps.course.deg()); dataFile.print(",");
 	dataFile.print(!gps.speed.kmph() ? 0 : gps.speed.kmph(), 2);dataFile.print(",");
 	
   if(createNewWaypoint) {
@@ -486,12 +480,12 @@ void writeToSD() {
 	dataFile.flush();
 	dataFile.close();
 
-  Serial.println("Location saved to SD.");
+  Serial.println("Location saved to SPIFFS.");
 }
 
 BLYNK_CONNECTED() {
   Blynk.syncAll();
-  Blynk.virtualWrite(V7, getTrackFileName());
+  Blynk.virtualWrite(V7, getTrackName());
 }
 
 BLYNK_WRITE(V1) {
@@ -559,8 +553,8 @@ BLYNK_WRITE(V11){
 
 BLYNK_WRITE(V12){
   if(param.asInt() == 1 && newTrackName != "") {
-    if(SD.exists(newTrackName)) {
-      SD.remove(newTrackName);
+    if(SPIFFS.exists("/" + newTrackName)) {
+      newTrackName += "_";
     }
 
     config.currentTrackName = newTrackName + ".gps";
@@ -569,21 +563,23 @@ BLYNK_WRITE(V12){
     config.trackPaused = 0;
     config.lastMapPointIndex = 0;
     
-    Blynk.virtualWrite(V7, getTrackFileName());
-    Blynk.notify("Started new track " + getTrackFileName());
-    myMap.clear();
+    Serial.println("Creating new track file " + getTrackName());
+    File dataFile = SPIFFS.open(getTrackFileName(), "w+");
+    dataFile.println(F("type, latitude, longitude, date, alt, speed, name, desc"));
+    dataFile.close();
 
+    Blynk.virtualWrite(V7, getTrackName());
+    Blynk.notify("Started new track " + getTrackName());
+    myMap.clear();
 
     Blynk.virtualWrite(V12, 0);
 
     newTrackName = "";
-
-    saveConfiguration(configFilename, config);
   }
 }
 
 BLYNK_WRITE(V13){
-  newTrackName = param.asString();  
+  newTrackName = param.asString();
 }
 
 BLYNK_WRITE(V14){
