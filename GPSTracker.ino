@@ -33,6 +33,8 @@ extern "C" {
 static const int RXPin = D1, TXPin = SW_SERIAL_UNUSED_PIN;
 static const uint32_t GPSBaud = 9600;
 const int powerSwitchPin = 10;
+const int blynkButtonPin = 12; // D6
+const int greenLEDPin = D5;
 
 String ftp_user = "gps-tracker";
 String ftp_pass = "gps-tracker";
@@ -53,9 +55,11 @@ String newTrackName = "";
 String waypointName = "";
 String waypointDesc = "";
 bool createNewWaypoint = false;
+bool blynkMode = false;
 
 FtpServer ftpSrv; 
 SimpleTimer timer;
+SimpleTimer timerLed;
 WidgetMap myMap(V0);
 TinyGPSPlus gps;
 SoftwareSerial ss(RXPin, TXPin);
@@ -74,7 +78,6 @@ struct Config {
   bool trackPaused = false;
   unsigned int frequencyWaypoints = 100;
   String sleepType = "MANUAL";
-  String deviceMode = "TRACKER";
   unsigned int lastMapPointIndex = 1;
   bool gpsFixNotify = false;
 };
@@ -83,31 +86,48 @@ const char *configFilename = "/CONFIG.TXT";
 Config config;
 
 void setup() {
-	WiFi.persistent( false );
-
+  pinMode(greenLEDPin, OUTPUT);
+  pinMode(blynkButtonPin, INPUT_PULLUP);
   pinMode(RXPin, INPUT);
   pinMode(powerSwitchPin, OUTPUT);
-  digitalWrite(powerSwitchPin, HIGH);
 
   Serial.begin(115200);
 
-  ss.begin(GPSBaud);
-  ss.enableIntTx(false);
+  blynkMode = digitalRead(blynkButtonPin) == LOW;
 
   initSPIFFS();
-  
-  initWiFi();
 
-  checkTraveledDistance();
+  if(!blynkMode) {
+    timerLed.setInterval(500, blinkConfigLED);
+
+    WiFi.forceSleepBegin();
+
+    digitalWrite(powerSwitchPin, HIGH);
+    
+    ss.begin(GPSBaud);
+    ss.enableIntTx(false);
+
+    runGPSTimer();
+  } else {
+    timerLed.setInterval(100, blinkConfigLED);
+    WiFi.persistent(false);
+    initWiFi();
+  }
 }
 
 void loop() {
-  Blynk.run();
   timer.run();
+  timerLed.run();
 
-  if(config.deviceMode == "FTP_SERVER") {
-    ftpSrv.handleFTP();
+  if(blynkMode) {
+    Blynk.run();
   }
+
+  ftpSrv.handleFTP();
+}
+
+void blinkConfigLED() {
+  digitalWrite(greenLEDPin, !digitalRead(greenLEDPin));
 }
 
 void initSPIFFS() {
@@ -144,19 +164,16 @@ void initWiFi() {
 }
 
 void initFTPServer() {
-  if(config.deviceMode == "FTP_SERVER") {
-    stopGPSTimer();
-    ftpSrv.begin(ftp_user,ftp_pass);
-    Serial.println("FTP server started");
+  ftpSrv.begin(ftp_user,ftp_pass);
+  Serial.println("FTP server started");
 
-    Blynk.virtualWrite(V23, "Started");
-    Blynk.virtualWrite(V19, WiFi.localIP().toString());
-    Blynk.virtualWrite(V20, ftp_user);
-    Blynk.virtualWrite(V21, ftp_pass);
-    Blynk.virtualWrite(V22, "21");
+  Blynk.virtualWrite(V23, "Started");
+  Blynk.virtualWrite(V19, WiFi.localIP().toString());
+  Blynk.virtualWrite(V20, ftp_user);
+  Blynk.virtualWrite(V21, ftp_pass);
+  Blynk.virtualWrite(V22, "21");
 
-    Blynk.notify("FTP server started");
-  }
+  Blynk.notify("FTP server started");
 }
 
 void checkWiFiConnect() {
@@ -179,8 +196,8 @@ void onWiFiConnected() {
   	timer.deleteTimer(WiFiConnectionTimer);
 
     Serial.println("WiFi connected");
-    Serial.print("IP address: ");Serial.println(WiFi.localIP());
-    
+    Serial.print("IP address: ");Serial.println(WiFi.localIP());    
+
     Blynk.config(auth);
     Blynk.connect();
 
@@ -210,19 +227,16 @@ void onBlynkConnectionTimeout() {
   Serial.println("Blynk connection timeout.");
   
   offlineMode();
-  if(config.deviceMode == "TRACKER") {
-    runGPSTimer();
-  }
+  runGPSTimer();
+  initFTPServer();
 }
 
 void onBlynkConnected() {
   timer.deleteTimer(blynkConnectionTimer);
 
   Serial.println("Blynk server connected");
-  
-  if(config.deviceMode == "TRACKER") {
-    runGPSTimer();
-  }
+  runGPSTimer();
+  initFTPServer();
 }
 
 void onWiFiConnectionTimeout() {
@@ -230,9 +244,7 @@ void onWiFiConnectionTimeout() {
   Serial.println("");
   offlineMode();
 
-  if(config.deviceMode == "TRACKER") {
-    runGPSTimer();
-  }  
+  runGPSTimer();
 }
 
 void loadConfiguration(JsonObject &root, Config &config) {
@@ -252,8 +264,6 @@ void loadConfiguration(JsonObject &root, Config &config) {
   config.sleepType = sleepType == "" ? config.sleepType : sleepType;
   config.lastMapPointIndex = root["lastMapPointIndex"] | config.lastMapPointIndex;
   config.gpsFixNotify = root["gpsFixNotify"] == 1 ? true : false;
-  String deviceMode = root["deviceMode"].as<String>();
-  config.deviceMode = deviceMode == "" ? config.deviceMode : deviceMode;
 
   root.printTo(Serial);
 }
@@ -308,7 +318,6 @@ void saveConfiguration(const char *filename, const Config &config) {
   root["sleepType"] = config.sleepType;
   root["lastMapPointIndex"] = config.lastMapPointIndex;
   root["gpsFixNotify"] = config.gpsFixNotify ? 1 : 0;
-  root["deviceMode"] = config.deviceMode;
 
   if (root.printTo(file) == 0) {
     Serial.println(F("Failed to write to file"));
@@ -332,20 +341,25 @@ void offlineMode() {
 }
 
 void runGPSTimer() {
+  Serial.println();
   Serial.println("Waiting for GPS data...");
   stopGPSTimer();
   startGPSFindTime = millis();
-  gpsTimer = timer.setInterval(0.01, processGPSData);
+  gpsTimer = timer.setInterval(0.005, processGPSData);
 }
 
-void sleep() {
-  saveConfiguration(configFilename, config);
-
+bool sleep() {
   Blynk.virtualWrite(V23, "Stopped");
 
-  if(config.sleepType == "NO_SLEEP") {
-    return;
+  if(blynkMode) {
+    return false;
   }
+
+  if(config.sleepType == "NO_SLEEP") {
+    return false;
+  }
+
+  saveConfiguration(configFilename, config);
 
 	if(config.sleepTime > 0 && config.sleepType == "MANUAL") {
 		Serial.println("");
@@ -399,7 +413,9 @@ void processGPSData() {
 
   if ( currentSearchTime > config.gpsSearchTime) {
     Serial.println("GPS fix not found.");
-    sleep();
+    if(!sleep()) {
+      startGPSFindTime = millis();
+    }
   }
 }
 
@@ -650,19 +666,4 @@ BLYNK_WRITE(V16){
 BLYNK_WRITE(V17){
   bool newState = param.asInt() == 1;
   config.gpsFixNotify = newState;
-}
-
-BLYNK_WRITE(V18){
-  switch(param.asInt()) {
-    case 0:
-      config.deviceMode = "TRACKER";
-      Blynk.virtualWrite(V23, "Stopped");
-      runGPSTimer();
-      break;
-    case 1:
-      config.deviceMode = "FTP_SERVER";
-      stopGPSTimer();
-      initFTPServer();
-      break;
-  }
 }
