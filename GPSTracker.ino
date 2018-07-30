@@ -1,19 +1,3 @@
-//#define FAKE_GPS;
-#ifdef FAKE_GPS;
-String NMEA[10] {
-  "$GPRMC,192631,A,5025.072260,N,03026.522160,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192631,5025.072260,N,03026.522160,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.072260,N,03026.522160,E,192631,A,A*4F\r\n$GPZDA,192631,17,05,2018,,*4E\r\n",
-  "$GPRMC,192641,A,5025.085880,N,03026.531982,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192641,5025.085880,N,03026.531982,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.085880,N,03026.531982,E,192641,A,A*42\r\n$GPZDA,192641,17,05,2018,,*49\r\n",
-  "$GPRMC,192651,A,5025.099499,N,03026.541803,E,5.4,24.7,170518,,,A*48\r\n$GPGGA,192651,5025.099499,N,03026.541803,E,1,12,0.78,3.0,M,0.0,M,,*4F\r\n$GPGLL,5025.099499,N,03026.541803,E,192651,A,A*45\r\n$GPZDA,192651,17,05,2018,,*48\r\n",
-  "$GPRMC,192701,A,5025.113119,N,03026.551625,E,5.4,24.7,170518,,,A*49\r\n$GPGGA,192701,5025.113119,N,03026.551625,E,1,12,0.78,3.0,M,0.0,M,,*4E\r\n$GPGLL,5025.113119,N,03026.551625,E,192701,A,A*44\r\n$GPZDA,192701,17,05,2018,,*4C\r\n",
-  "$GPRMC,192711,A,5025.126739,N,03026.561447,E,5.4,24.7,170518,,,A*4F\r\n$GPGGA,192711,5025.126739,N,03026.561447,E,1,12,0.78,3.0,M,0.0,M,,*48\r\n$GPGLL,5025.126739,N,03026.561447,E,192711,A,A*42\r\n$GPZDA,192711,17,05,2018,,*4D\r\n",
-  "$GPRMC,192721,A,5025.140358,N,03026.571269,E,5.4,24.7,170518,,,A*44\r\n$GPGGA,192721,5025.140358,N,03026.571269,E,1,12,0.78,3.0,M,0.0,M,,*43\r\n$GPGLL,5025.140358,N,03026.571269,E,192721,A,A*49\r\n$GPZDA,192721,17,05,2018,,*4E\r\n",
-  "$GPRMC,192731,A,5025.153978,N,03026.581091,E,5.4,24.7,170518,,,A*45\r\n$GPGGA,192731,5025.153978,N,03026.581091,E,1,12,0.78,3.0,M,0.0,M,,*42\r\n$GPGLL,5025.153978,N,03026.581091,E,192731,A,A*48\r\n$GPZDA,192731,17,05,2018,,*4F\r\n",
-  "$GPRMC,192741,A,5025.167597,N,03026.590914,E,5.4,24.7,170518,,,A*4C\r\n$GPGGA,192741,5025.167597,N,03026.590914,E,1,12,0.78,3.0,M,0.0,M,,*4B\r\n$GPGLL,5025.167597,N,03026.590914,E,192741,A,A*41\r\n$GPZDA,192741,17,05,2018,,*48\r\n",
-  "$GPRMC,192751,A,5025.181217,N,03026.600736,E,5.4,24.7,170518,,,A*4E\r\n$GPGGA,192751,5025.181217,N,03026.600736,E,1,12,0.78,3.0,M,0.0,M,,*49\r\n$GPGLL,5025.181217,N,03026.600736,E,192751,A,A*43\r\n$GPZDA,192751,17,05,2018,,*49\r\n",
-  "$GPRMC,192801,A,5025.194836,N,03026.610558,E,5.4,24.7,170518,,,A*42\r\n$GPGGA,192801,5025.194836,N,03026.610558,E,1,12,0.78,3.0,M,0.0,M,,*45\r\n$GPGLL,5025.194836,N,03026.610558,E,192801,A,A*4F\r\n$GPZDA,192801,17,05,2018,,*43\r\n"
-};
-#endif
-
 #define BLYNK_PRINT Serial
 
 #include <ESP8266WiFi.h>
@@ -27,7 +11,7 @@ String NMEA[10] {
 #include <ESP8266FtpServer.h>
 
 extern "C" {
-	#include "user_interface.h"
+#include "user_interface.h"
 }
 
 static const int RXPin = D1, TXPin = SW_SERIAL_UNUSED_PIN;
@@ -54,7 +38,7 @@ unsigned int blynkConnectionRetries;
 String newTrackName = "";
 bool blynkMode = false;
 
-FtpServer ftpSrv; 
+FtpServer ftpSrv;
 SimpleTimer timer;
 SimpleTimer timerLed;
 TinyGPSPlus gps;
@@ -91,7 +75,7 @@ void setup() {
 
   digitalWrite(powerSwitchPin, HIGH);
 
-  if(!blynkMode) {
+  if (!blynkMode) {
     timerLed.setInterval(1000, blinkConfigLED);
 
     system_update_cpu_freq(80);
@@ -115,7 +99,7 @@ void loop() {
   timer.run();
   timerLed.run();
 
-  if(blynkMode) {
+  if (blynkMode) {
     Blynk.run();
   }
 
@@ -144,7 +128,7 @@ void initSPIFFS() {
 
   if (!SPIFFS.exists(getTrackFileName()))
   {
-  	Serial.println("Creating new track file " + getTrackName());
+    Serial.println("Creating new track file " + getTrackName());
     File dataFile = SPIFFS.open(getTrackFileName(), "w+");
     dataFile.println(F("latitude, longitude, date, alt, speed"));
     dataFile.close();
@@ -158,11 +142,11 @@ void initWiFi() {
   WiFi.begin(ssid, pass);
 
   wifiConnectionRetries = config.wifiConnectionRetries;
-	WiFiConnectionTimer = timer.setInterval(config.wifiConnectionTimeout, checkWiFiConnect);
+  WiFiConnectionTimer = timer.setInterval(config.wifiConnectionTimeout, checkWiFiConnect);
 }
 
 void initFTPServer() {
-  ftpSrv.begin(ftp_user,ftp_pass);
+  ftpSrv.begin(ftp_user, ftp_pass);
   Serial.println("FTP server started");
 
   Blynk.virtualWrite(V23, "Started");
@@ -189,16 +173,16 @@ void checkWiFiConnect() {
 }
 
 void onWiFiConnected() {
-  	timer.deleteTimer(WiFiConnectionTimer);
+  timer.deleteTimer(WiFiConnectionTimer);
 
-    Serial.println("WiFi connected");
-    Serial.print("IP address: ");Serial.println(WiFi.localIP());    
+  Serial.println("WiFi connected");
+  Serial.print("IP address: "); Serial.println(WiFi.localIP());
 
-    Blynk.config(auth);
-    Blynk.connect();
+  Blynk.config(auth);
+  Blynk.connect();
 
-    blynkConnectionRetries = config.blynkConnectionRetries;
-    blynkConnectionTimer = timer.setInterval(config.blynkConnectionTimeout, checkBlynkConnect);
+  blynkConnectionRetries = config.blynkConnectionRetries;
+  blynkConnectionTimer = timer.setInterval(config.blynkConnectionTimeout, checkBlynkConnect);
 }
 
 void checkBlynkConnect() {
@@ -211,7 +195,7 @@ void checkBlynkConnect() {
   if (Blynk.connected()) {
     onBlynkConnected();
 
-		return;
+    return;
   }
 
   blynkConnectionRetries--;
@@ -221,7 +205,7 @@ void onBlynkConnectionTimeout() {
   timer.deleteTimer(blynkConnectionTimer);
 
   Serial.println("Blynk connection timeout.");
-  
+
   offlineMode();
   runGPSTimer();
   initFTPServer();
@@ -231,16 +215,12 @@ void onBlynkConnected() {
   timer.deleteTimer(blynkConnectionTimer);
 
   Serial.println("Blynk server connected");
-  runGPSTimer();
   initFTPServer();
 }
 
 void onWiFiConnectionTimeout() {
   timer.deleteTimer(WiFiConnectionTimer);
-  Serial.println("");
   offlineMode();
-
-  runGPSTimer();
 }
 
 void loadConfiguration(JsonObject &root, Config &config) {
@@ -276,15 +256,15 @@ void loadConfiguration(const char *filename, Config &config) {
   }
 
   loadConfiguration(root, config);
-  
+
   file.close();
 }
 
 // Saves the configuration to a file
 void saveConfiguration(const char *filename, const Config &config, bool print) {
-  if(print) {
+  if (print) {
     Serial.println("");
-    Serial.println("Saving configuration...");  
+    Serial.println("Saving configuration...");
   }
 
   File file = SPIFFS.open(filename, "w+");
@@ -312,13 +292,13 @@ void saveConfiguration(const char *filename, const Config &config, bool print) {
     Serial.println(F("Failed to write to file"));
   }
 
-  if(print) {
+  if (print) {
     root.printTo(Serial);
   }
 
   Serial.println("");
   Serial.println("Saved");
-  
+
   file.close();
 }
 
@@ -332,24 +312,24 @@ void runGPSTimer() {
   Serial.println("Waiting for GPS data...");
   stopGPSTimer();
   startGPSFindTime = millis();
-  gpsTimer = timer.setInterval(0.005, processGPSData);
+  gpsTimer = timer.setInterval(0.01, processGPSData);
 }
 
 bool sleep() {
-  Blynk.virtualWrite(V23, "Stopped");
-
-  if(blynkMode) {
+  if (blynkMode) {
+    Blynk.virtualWrite(V23, "Stopped");
+    
     return false;
   }
 
   saveConfiguration(configFilename, config, true);
 
-	if(config.sleepTime > 0) {
-		Serial.println("");
-		Serial.println("Sleeping...");
+  if (config.sleepTime > 0) {
+    Serial.println("");
+    Serial.println("Sleeping...");
 
-		ESP.deepSleep(config.sleepTime, WAKE_RF_DEFAULT);
-	}
+    ESP.deepSleep(config.sleepTime, WAKE_RF_DEFAULT);
+  }
 }
 
 void stopGPSTimer() {
@@ -361,37 +341,15 @@ void processGPSData() {
   char character;
   unsigned long currentSearchTime =  millis() - startGPSFindTime;
 
-  #ifdef FAKE_GPS
-  	int i = 0;
-
-    int index = config.lastMapPointIndex;
-    if(index >= 10) {
-      config.lastMapPointIndex = 0;
-      index = 0;
+  while (ss.available() && currentSearchTime <= config.gpsSearchTime) {
+    if (gps.encode(ss.read())) {
+      displayInfo();
     }
-
-    String nmeaBuff = NMEA[index];
-		for(i = 0; i < nmeaBuff.length() - 1; i++) {
-			character = nmeaBuff[i];
-	    if (gps.encode(character)) {       
-	      displayInfo();
-	    }
-      delay(2);
-	  }
-    config.lastMapPointIndex++;
-  #else
-	  while (ss.available() && currentSearchTime <= config.gpsSearchTime) {
-	    character = ss.read();
-	    content.concat(character);
-	    if (gps.encode(character)) {
-	      displayInfo();
-	    }
-	  }
-  #endif
+  }
 
   if ( currentSearchTime > config.gpsSearchTime) {
     Serial.println("GPS fix not found.");
-    if(!sleep()) {
+    if (!sleep()) {
       startGPSFindTime = millis();
     }
   }
@@ -406,7 +364,7 @@ void displayInfo() {
     float alt = gps.altitude.meters();
     int sats = gps.satellites.value();
 
-    if(checkTraveledDistance()) {
+    if (checkTraveledDistance()) {
       Serial.print("LAT:  ");
       Serial.println(latitude, 6);
       Serial.print("LONG: ");
@@ -426,43 +384,39 @@ void displayInfo() {
 }
 
 String getTrackFileName() {
-	return "/" + config.currentTrackName;
+  return "/" + config.currentTrackName;
 }
 
 String getTrackName() {
-	return config.currentTrackName;
+  return config.currentTrackName;
 }
 
 bool fixFound() {
-	return gps.location.isValid() && gps.speed.isValid() && gps.date.isValid();
+  return gps.location.isValid() && gps.speed.isValid() && gps.date.isValid();
 }
 
 float calculateMaxIddleTime() {
-	return ((config.gpsSearchTime + (config.wifiConnectionTimeout * config.wifiConnectionRetries)) / 1000) + (config.sleepTime / 1000000); //Seconds.
+  return ((config.gpsSearchTime + (config.wifiConnectionTimeout * config.wifiConnectionRetries)) / 1000) + (config.sleepTime / 1000000); //Seconds.
 }
 
 bool checkTraveledDistance() {
-	if(!fixFound()) {
-		return false;
-	}
-
-	if(config.prevLatitude == 0 && config.prevLongitude == 0) {
-		config.prevLatitude = gps.location.lat();
-		config.prevLongitude = gps.location.lng();
-	}
+  if (config.prevLatitude == 0 && config.prevLongitude == 0) {
+    config.prevLatitude = gps.location.lat();
+    config.prevLongitude = gps.location.lng();
+  }
 
   float speed = ceil(gps.speed.mps());
   unsigned long distance = TinyGPSPlus::distanceBetween(config.prevLatitude, config.prevLongitude, gps.location.lat(), gps.location.lng()); //Meters
 
-  if(speed > 1 && config.frequencyWaypoints > 0) {
-		int newSleepTime = ceil(config.frequencyWaypoints / speed);
-		config.sleepTime = newSleepTime <= 2 ? 2e6 : newSleepTime * 1000000;
-		Serial.println("New sleep time is: " + String(newSleepTime));
+  if (speed > 1 && config.frequencyWaypoints > 0) {
+    int newSleepTime = ceil(config.frequencyWaypoints / speed);
+    config.sleepTime = newSleepTime <= 2 ? 2e6 : newSleepTime * 1000000;
+    Serial.println("New sleep time is: " + String(newSleepTime));
   }
 
   Serial.println("Traveled distance from previous point: " + String(distance));
 
-  if(config.frequencyWaypoints <= 0) {
+  if (config.frequencyWaypoints <= 0) {
     return true;
   }
 
@@ -471,31 +425,31 @@ bool checkTraveledDistance() {
 }
 
 void writeToSPIFF() {
-	char date[32];
-	sprintf(date, "%02d-%02d-%02d %02d:%02d:%02d ", gps.date.month(), gps.date.day(), gps.date.year(),  gps.time.hour(),  gps.time.minute(),  gps.time.second());
-	File dataFile = SPIFFS.open(getTrackFileName(), "a+");
+  char date[32];
+  sprintf(date, "%02d-%02d-%02d %02d:%02d:%02d ", gps.date.month(), gps.date.day(), gps.date.year(),  gps.time.hour(),  gps.time.minute(),  gps.time.second());
+  File dataFile = SPIFFS.open(getTrackFileName(), "a+");
 
   config.prevLatitude = gps.location.lat();
   config.prevLongitude = gps.location.lng();
 
-	Serial.println();
+  Serial.println();
 
-	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lat(), 6); dataFile.print(",");
-	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lng(), 6); dataFile.print(",");
+  dataFile.print(!gps.location.isValid() ? 0 : gps.location.lat(), 6); dataFile.print(",");
+  dataFile.print(!gps.location.isValid() ? 0 : gps.location.lng(), 6); dataFile.print(",");
 
-	if (!gps.date.isValid() && !gps.time.isValid()) {
-	  dataFile.print("0");
-	} else {
-	  dataFile.print(date);
-	}
-	dataFile.print(",");
+  if (!gps.date.isValid() && !gps.time.isValid()) {
+    dataFile.print("0");
+  } else {
+    dataFile.print(date);
+  }
+  dataFile.print(",");
 
-	dataFile.print(!gps.altitude.isValid() ? 0 : gps.altitude.meters()); dataFile.print(",");
-	dataFile.print(!gps.speed.kmph() ? 0 : gps.speed.kmph(), 2);dataFile.print(",");
+  dataFile.print(!gps.altitude.isValid() ? 0 : gps.altitude.meters()); dataFile.print(",");
+  dataFile.print(!gps.speed.kmph() ? 0 : gps.speed.kmph(), 2); dataFile.print(",");
 
-	dataFile.println();
-	dataFile.flush();
-	dataFile.close();
+  dataFile.println();
+  dataFile.flush();
+  dataFile.close();
 
   Serial.println("Location saved to SPIFFS.");
 }
@@ -508,7 +462,7 @@ BLYNK_CONNECTED() {
 BLYNK_WRITE(V1) {
   config.gpsSearchTime = param.asInt() * 1000;
 
-  saveConfiguration(configFilename, config, false); 
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V2) {
@@ -517,46 +471,46 @@ BLYNK_WRITE(V2) {
   saveConfiguration(configFilename, config, false);
 }
 
-BLYNK_WRITE(V3){
+BLYNK_WRITE(V3) {
   config.wifiConnectionTimeout = param.asInt();
 
   saveConfiguration(configFilename, config, false);
 }
 
-BLYNK_WRITE(V4){
-  config.wifiConnectionRetries = param.asInt(); 
+BLYNK_WRITE(V4) {
+  config.wifiConnectionRetries = param.asInt();
 
   saveConfiguration(configFilename, config, false);
 }
 
-BLYNK_WRITE(V5){
-  config.blynkConnectionTimeout = param.asInt(); 
+BLYNK_WRITE(V5) {
+  config.blynkConnectionTimeout = param.asInt();
 
   saveConfiguration(configFilename, config, false);
 }
 
-BLYNK_WRITE(V6){
-  config.blynkConnectionRetries = param.asInt(); 
+BLYNK_WRITE(V6) {
+  config.blynkConnectionRetries = param.asInt();
 
   saveConfiguration(configFilename, config, false);
 }
 
-BLYNK_WRITE(V9){
-  config.frequencyWaypoints = param.asInt(); 
+BLYNK_WRITE(V9) {
+  config.frequencyWaypoints = param.asInt();
 
   saveConfiguration(configFilename, config, false);
 }
 
-BLYNK_WRITE(V12){
-  if(param.asInt() == 1 && newTrackName != "") {
-    if(SPIFFS.exists("/" + newTrackName)) {
+BLYNK_WRITE(V12) {
+  if (param.asInt() == 1 && newTrackName != "") {
+    if (SPIFFS.exists("/" + newTrackName)) {
       newTrackName += "_";
     }
 
     config.currentTrackName = newTrackName + ".gps";
     config.prevLatitude = 0;
     config.prevLongitude = 0;
-    
+
     Serial.println("Creating new track file " + getTrackName());
     File dataFile = SPIFFS.open(getTrackFileName(), "w+");
     dataFile.println(F("type, latitude, longitude, date, alt, speed, name, desc"));
@@ -573,7 +527,7 @@ BLYNK_WRITE(V12){
   }
 }
 
-BLYNK_WRITE(V13){
+BLYNK_WRITE(V13) {
   newTrackName = param.asString();
 
   saveConfiguration(configFilename, config, false);
