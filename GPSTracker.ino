@@ -89,20 +89,23 @@ void setup() {
 
   initSPIFFS();
 
+  digitalWrite(powerSwitchPin, HIGH);
+
   if(!blynkMode) {
-    timerLed.setInterval(500, blinkConfigLED);
+    timerLed.setInterval(1000, blinkConfigLED);
 
+    system_update_cpu_freq(80);
     WiFi.forceSleepBegin();
-    WiFi.mode(WIFI_OFF);
+    delay(1);
 
-    digitalWrite(powerSwitchPin, HIGH);
-    
     ss.begin(GPSBaud);
     ss.enableIntTx(false);
 
     runGPSTimer();
   } else {
-    timerLed.setInterval(100, blinkConfigLED);
+    system_update_cpu_freq(80);
+
+    timerLed.setInterval(250, blinkConfigLED);
     WiFi.persistent(false);
     initWiFi();
   }
@@ -120,7 +123,9 @@ void loop() {
 }
 
 void blinkConfigLED() {
-  digitalWrite(greenLEDPin, !digitalRead(greenLEDPin));
+  digitalWrite(greenLEDPin, HIGH);
+  delay(25);
+  digitalWrite(greenLEDPin, LOW);
 }
 
 void initSPIFFS() {
@@ -456,6 +461,10 @@ bool checkTraveledDistance() {
   }
 
   Serial.println("Traveled distance from previous point: " + String(distance));
+
+  if(config.frequencyWaypoints <= 0) {
+    return true;
+  }
 
   //3000 - higher limit when GPS transferred wrong coordinates
   return (distance >= config.frequencyWaypoints)  && (distance <= 3000);
