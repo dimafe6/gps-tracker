@@ -52,15 +52,11 @@ int gpsTimer;
 unsigned int wifiConnectionRetries;
 unsigned int blynkConnectionRetries;
 String newTrackName = "";
-String waypointName = "";
-String waypointDesc = "";
-bool createNewWaypoint = false;
 bool blynkMode = false;
 
 FtpServer ftpSrv; 
 SimpleTimer timer;
 SimpleTimer timerLed;
-WidgetMap myMap(V0);
 TinyGPSPlus gps;
 SoftwareSerial ss(RXPin, TXPin);
 File root;
@@ -75,11 +71,7 @@ struct Config {
   unsigned int blynkConnectionTimeout = 100;
   unsigned int blynkConnectionRetries = 50;
   String currentTrackName = "track0.gps";
-  bool trackPaused = false;
   unsigned int frequencyWaypoints = 100;
-  String sleepType = "MANUAL";
-  unsigned int lastMapPointIndex = 1;
-  bool gpsFixNotify = false;
 };
 
 const char *configFilename = "/CONFIG.TXT";
@@ -101,6 +93,7 @@ void setup() {
     timerLed.setInterval(500, blinkConfigLED);
 
     WiFi.forceSleepBegin();
+    WiFi.mode(WIFI_OFF);
 
     digitalWrite(powerSwitchPin, HIGH);
     
@@ -148,7 +141,7 @@ void initSPIFFS() {
   {
   	Serial.println("Creating new track file " + getTrackName());
     File dataFile = SPIFFS.open(getTrackFileName(), "w+");
-    dataFile.println(F("type, latitude, longitude, date, alt, speed, name, desc"));
+    dataFile.println(F("latitude, longitude, date, alt, speed"));
     dataFile.close();
   }
 }
@@ -172,8 +165,6 @@ void initFTPServer() {
   Blynk.virtualWrite(V20, ftp_user);
   Blynk.virtualWrite(V21, ftp_pass);
   Blynk.virtualWrite(V22, "21");
-
-  Blynk.notify("FTP server started");
 }
 
 void checkWiFiConnect() {
@@ -258,12 +249,7 @@ void loadConfiguration(JsonObject &root, Config &config) {
   config.blynkConnectionRetries = root["blynkConnectionRetries"] | config.blynkConnectionRetries;
   String currentTrackName = root["currentTrackName"].as<String>();
   config.currentTrackName = currentTrackName == "" ? config.currentTrackName : currentTrackName;
-  config.trackPaused = root["trackPaused"] == 1 ? true : false;
   config.frequencyWaypoints = root["frequencyWaypoints"] | config.frequencyWaypoints;
-  String sleepType = root["sleepType"].as<String>();
-  config.sleepType = sleepType == "" ? config.sleepType : sleepType;
-  config.lastMapPointIndex = root["lastMapPointIndex"] | config.lastMapPointIndex;
-  config.gpsFixNotify = root["gpsFixNotify"] == 1 ? true : false;
 
   root.printTo(Serial);
 }
@@ -290,9 +276,11 @@ void loadConfiguration(const char *filename, Config &config) {
 }
 
 // Saves the configuration to a file
-void saveConfiguration(const char *filename, const Config &config) {
-  Serial.println("");
-  Serial.println("Saving configuration...");  
+void saveConfiguration(const char *filename, const Config &config, bool print) {
+  if(print) {
+    Serial.println("");
+    Serial.println("Saving configuration...");  
+  }
 
   File file = SPIFFS.open(filename, "w+");
   if (!file) {
@@ -313,31 +301,25 @@ void saveConfiguration(const char *filename, const Config &config) {
   root["blynkConnectionTimeout"] = config.blynkConnectionTimeout;
   root["blynkConnectionRetries"] = config.blynkConnectionRetries;
   root["currentTrackName"] = config.currentTrackName;
-  root["trackPaused"] = config.trackPaused ? 1 : 0;
   root["frequencyWaypoints"] = config.frequencyWaypoints;
-  root["sleepType"] = config.sleepType;
-  root["lastMapPointIndex"] = config.lastMapPointIndex;
-  root["gpsFixNotify"] = config.gpsFixNotify ? 1 : 0;
 
   if (root.printTo(file) == 0) {
     Serial.println(F("Failed to write to file"));
-  } else {
-    String settings;
-    root.printTo(settings);
   }
 
-  root.printTo(Serial);
-  
+  if(print) {
+    root.printTo(Serial);
+  }
+
   Serial.println("");
-  Serial.println("OK");
+  Serial.println("Saved");
   
   file.close();
 }
 
 void offlineMode() {
   Serial.println("Offline mode");
-  wifi_set_sleep_type(MODEM_SLEEP_T);
-  delay(1);
+  ESP.deepSleep(1e1, WAKE_RF_DEFAULT);
 }
 
 void runGPSTimer() {
@@ -355,13 +337,9 @@ bool sleep() {
     return false;
   }
 
-  if(config.sleepType == "NO_SLEEP") {
-    return false;
-  }
+  saveConfiguration(configFilename, config, true);
 
-  saveConfiguration(configFilename, config);
-
-	if(config.sleepTime > 0 && config.sleepType == "MANUAL") {
+	if(config.sleepTime > 0) {
 		Serial.println("");
 		Serial.println("Sleeping...");
 
@@ -377,11 +355,6 @@ void processGPSData() {
   String content = "";
   char character;
   unsigned long currentSearchTime =  millis() - startGPSFindTime;
-
-  if (config.trackPaused) {
-    Serial.println("Track paused.");
-    sleep();
-  }
 
   #ifdef FAKE_GPS
   	int i = 0;
@@ -402,7 +375,7 @@ void processGPSData() {
 	  }
     config.lastMapPointIndex++;
   #else
-	  while (ss.available() && currentSearchTime <= config.gpsSearchTime && config.trackPaused == false) {
+	  while (ss.available() && currentSearchTime <= config.gpsSearchTime) {
 	    character = ss.read();
 	    content.concat(character);
 	    if (gps.encode(character)) {
@@ -442,11 +415,6 @@ void displayInfo() {
 
       writeToSPIFF();
 
-      if(config.gpsFixNotify) {
-        Serial.println("GPS fix found");
-        Blynk.notify("GPS fix found");
-      }
-
       sleep();
     }
   }
@@ -481,7 +449,7 @@ bool checkTraveledDistance() {
   float speed = ceil(gps.speed.mps());
   unsigned long distance = TinyGPSPlus::distanceBetween(config.prevLatitude, config.prevLongitude, gps.location.lat(), gps.location.lng()); //Meters
 
-  if(speed > 1 && config.sleepType == "AUTO") {
+  if(speed > 1 && config.frequencyWaypoints > 0) {
 		int newSleepTime = ceil(config.frequencyWaypoints / speed);
 		config.sleepTime = newSleepTime <= 2 ? 2e6 : newSleepTime * 1000000;
 		Serial.println("New sleep time is: " + String(newSleepTime));
@@ -503,13 +471,6 @@ void writeToSPIFF() {
 
 	Serial.println();
 
-  if(createNewWaypoint) {
-    dataFile.print("W");
-  } else {
-    dataFile.print("T");
-  }
-
-  dataFile.print(",");
 	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lat(), 6); dataFile.print(",");
 	dataFile.print(!gps.location.isValid() ? 0 : gps.location.lng(), 6); dataFile.print(",");
 
@@ -522,21 +483,6 @@ void writeToSPIFF() {
 
 	dataFile.print(!gps.altitude.isValid() ? 0 : gps.altitude.meters()); dataFile.print(",");
 	dataFile.print(!gps.speed.kmph() ? 0 : gps.speed.kmph(), 2);dataFile.print(",");
-	
-  if(createNewWaypoint) {
-    myMap.location(config.lastMapPointIndex++, config.prevLatitude, config.prevLongitude, waypointName);
-
-    dataFile.print(waypointName);dataFile.print(",");
-    dataFile.print(waypointDesc);
-
-    createNewWaypoint = false;
-    Blynk.virtualWrite(V15,  0);
-    Blynk.notify("Added waypoint " + waypointName);
-    waypointName = "";
-    waypointDesc = "";
-  } else {
-    myMap.location(config.lastMapPointIndex++, config.prevLatitude, config.prevLongitude, date);
-  }
 
 	dataFile.println();
 	dataFile.flush();
@@ -551,69 +497,45 @@ BLYNK_CONNECTED() {
 }
 
 BLYNK_WRITE(V1) {
-  config.gpsSearchTime = param.asInt() * 1000; 
+  config.gpsSearchTime = param.asInt() * 1000;
+
+  saveConfiguration(configFilename, config, false); 
 }
 
 BLYNK_WRITE(V2) {
-  config.sleepTime = param.asInt() * 1000 * 1000; 
+  config.sleepTime = param.asInt() * 1000 * 1000;
+
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V3){
-  config.wifiConnectionTimeout = param.asInt(); 
+  config.wifiConnectionTimeout = param.asInt();
+
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V4){
   config.wifiConnectionRetries = param.asInt(); 
+
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V5){
   config.blynkConnectionTimeout = param.asInt(); 
+
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V6){
   config.blynkConnectionRetries = param.asInt(); 
-}
 
-BLYNK_WRITE(V8){
-  bool newState = param.asInt() == 1;
-
-  if(newState != config.trackPaused) {
-    if(newState) {
-      Blynk.notify("Current track paused");
-    } else {
-      Blynk.notify("Current track resumed");
-    }
-  }
-  config.trackPaused = newState;
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V9){
   config.frequencyWaypoints = param.asInt(); 
-}
 
-BLYNK_WRITE(V10){
-  switch(param.asInt()) {
-    case 1:
-      config.sleepType = "AUTO";
-      break;
-    case 2:
-      config.sleepType = "MANUAL";
-      break;
-    case 3:
-      config.sleepType = "NO_SLEEP";
-      break;
-    default:
-      config.sleepType = "MANUAL";
-      break;
-  }
-}
-
-BLYNK_WRITE(V11){
-  if(param.asInt() == 1) {
-    config.lastMapPointIndex = 0;
-    myMap.clear();
-    Blynk.virtualWrite(V11, 0);
-  }
+  saveConfiguration(configFilename, config, false);
 }
 
 BLYNK_WRITE(V12){
@@ -625,8 +547,6 @@ BLYNK_WRITE(V12){
     config.currentTrackName = newTrackName + ".gps";
     config.prevLatitude = 0;
     config.prevLongitude = 0;
-    config.trackPaused = 0;
-    config.lastMapPointIndex = 0;
     
     Serial.println("Creating new track file " + getTrackName());
     File dataFile = SPIFFS.open(getTrackFileName(), "w+");
@@ -635,35 +555,17 @@ BLYNK_WRITE(V12){
 
     Blynk.virtualWrite(V7, getTrackName());
     Blynk.notify("Started new track " + getTrackName());
-    myMap.clear();
 
     Blynk.virtualWrite(V12, 0);
 
     newTrackName = "";
+
+    saveConfiguration(configFilename, config, false);
   }
 }
 
 BLYNK_WRITE(V13){
   newTrackName = param.asString();
-}
 
-BLYNK_WRITE(V14){
-  waypointName = param.asString();  
-}
-
-BLYNK_WRITE(V15){
-  if(param.asInt() == 1 && waypointName != "") {
-    createNewWaypoint = true;
-  } else {
-    createNewWaypoint = false;
-  }
-}
-
-BLYNK_WRITE(V16){
-  waypointDesc = param.asString();  
-}
-
-BLYNK_WRITE(V17){
-  bool newState = param.asInt() == 1;
-  config.gpsFixNotify = newState;
+  saveConfiguration(configFilename, config, false);
 }
